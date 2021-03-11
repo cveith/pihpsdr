@@ -84,6 +84,8 @@ enum {
   PAN_MINUS,
   PAN_PLUS,
   PS,
+  MICPTT,
+  EXTPTT,
   RIT,
   RIT_CLEAR,
   RIT_MINUS,
