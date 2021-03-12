@@ -604,6 +604,7 @@ void new_menu()
       case CONTROLLER1:
       case CONTROLLER2_V1:
       case CONTROLLER2_V2:
+      case PICOHPSDR_CONTROLLER:
         {
 #ifdef GPIO
         GtkWidget *encoders_b=gtk_button_new_with_label("Encoders");
