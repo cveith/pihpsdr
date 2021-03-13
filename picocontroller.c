@@ -52,6 +52,7 @@
 #include "sliders.h"
 #include "new_protocol.h"
 #include "zoompan.h"
+#include "switch_menu.h"
 
 char *picopropertiesfile = "picocontroller.props" ;
 
@@ -148,6 +149,86 @@ void pico_configure(GtkWidget *notebook, GtkWidget *grid) {
     col++;
     
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),grid,gtk_label_new("PIcoHPSDR Controller"));
+}
+
+void pico_configure_encoders() {
+}
+
+void pico_configure_switches(){
+//         row=row+5;
+//     col=0;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[0].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(0));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[1].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(1));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[2].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(2));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[3].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(3));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[4].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(4));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[5].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(5));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[6].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(6));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+// 
+//     row=original_row;
+//     col=8;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[7].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(7));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     row++;
+//     col=7;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[8].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(8));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[9].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(9));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     row++;
+//     col=7;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[10].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(10));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[11].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(11));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     row++;
+//     col=7;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[12].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(12));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[13].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(13));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     row++;
+//     col=7;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[14].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(14));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+//     col++;
+//     widget=gtk_button_new_with_label(sw_string[temp_switches[15].switch_function]);
+//     g_signal_connect(widget,"button_press_event",G_CALLBACK(switch_cb),GINT_TO_POINTER(15));
+//     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+// 
+//     gtk_container_add(GTK_CONTAINER(content),grid);
 }
     
 void pico_set_defaults(int ctrlr) {
