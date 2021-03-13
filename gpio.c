@@ -632,6 +632,9 @@ void gpio_set_defaults(int ctrlr) {
       encoders=encoders_controller2_v2;
       switches=switches_controller2_v2;
       break;
+    case PICOHPSDR_CONTROLLER:
+        encoders = encoders_no_controller;
+        switches = switches_controller1[0];
   }
 }
 
