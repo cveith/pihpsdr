@@ -35,6 +35,7 @@
 #include "toolbar.h"
 #include "actions.h"
 #include "gpio.h"
+#include "picocontroller.h"
 #include "i2c.h"
 
 typedef struct _choice {
