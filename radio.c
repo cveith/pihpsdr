@@ -56,6 +56,7 @@
 #endif
 #include "actions.h"
 #include "gpio.h"
+#include "picocontroller.h"
 #include "vfo.h"
 #include "vox.h"
 #include "meter.h"
