@@ -110,6 +110,52 @@ PICOSWITCH picoswitches[MAX_PICOSWITCHES] = {
     {FALSE, 34, NB},
     {FALSE, 35, SNB}};
 
+void pico_configure(GtkWidget *notebook, GtkWidget *grid) {
+    
+        int col = 0;
+        int row = 0;
+        GtkWidget *widget;
+    
+    widget=gtk_label_new("");
+    gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+    col++;
+
+    widget=gtk_label_new(NULL);
+    gtk_label_set_markup (GTK_LABEL(widget), "Serial Device:");
+    gtk_grid_attach(GTK_GRID(grid),widget,col,row,2,1);
+    col+=2;
+
+    widget=gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(widget),picocontroller.controller_device);
+    gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+    col++;
+
+    col = 0;
+    row++;
+
+    widget=gtk_label_new("");
+    gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+    col++;
+
+    widget=gtk_label_new(NULL);
+    gtk_label_set_markup (GTK_LABEL(widget), "Serial Speed:");
+    gtk_grid_attach(GTK_GRID(grid),widget,col,row,2,1);
+    col+=2;
+
+    widget=gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(widget), picocontroller.baudrate);
+    gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
+    col++;
+    
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook),grid,gtk_label_new("PIcoHPSDR Controller"));
+}
+    
+void pico_set_defaults(int ctrlr) {
+
+  g_print("%s: %d\n",__FUNCTION__,ctrlr);
+  
+}
+    
 void pico_restore_actions()
 {
     if (controller != PICOHPSDR_CONTROLLER)

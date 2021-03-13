@@ -50,6 +50,8 @@ extern PICOCONTROLLER picocontroller;
 extern PICOENCODER picoencoders[MAX_PICOENCODERS]; 
 extern PICOSWITCH picoswitches[MAX_PICOSWITCHES];
 
+extern void pico_configure(GtkWidget *notebook, GtkWidget *grid);
+
 extern void pico_set_defaults(int ctrlr);
 extern void pico_restore_actions();
 extern void pico_restore_state();
