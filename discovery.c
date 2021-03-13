@@ -52,6 +52,7 @@
 #ifdef GPIO
 #include "actions.h"
 #include "gpio.h"
+#include "picocontroller.h"
 #include "configure.h"
 #endif
 #include "protocols.h"
@@ -231,8 +232,12 @@ static gboolean gpio_cb (GtkWidget *widget, GdkEventButton *event, gpointer data
 
 static void gpio_changed_cb(GtkWidget *widget, gpointer data) {
   controller=gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+  
   gpio_set_defaults(controller);
   gpio_save_state();
+         
+  pico_set_defaults(controller);
+  pico_save_state();
 }
 #endif
 
@@ -566,6 +571,9 @@ fprintf(stderr,"%p Protocol=%d name=%s\n",d,d->protocol,d->name);
     controller=CONTROLLER2_V2;
     gpio_set_defaults(controller);
     gpio_restore_state();
+
+    if (controller == PICOHPSDR_CONTROLLER)
+      pico_restore_state();
 
     GtkWidget *gpio=gtk_combo_box_text_new();
     gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(gpio),NULL,"No Controller");
