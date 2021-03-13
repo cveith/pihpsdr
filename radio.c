@@ -615,6 +615,9 @@ if(!radio_is_remote) {
     if(gpio_init()<0) {
       g_print("GPIO failed to initialize\n");
     }
+    if (pico_init()<0) {
+        g_print("PIcoController failed to initialize\n");
+    }
 #endif
   }
 
