@@ -46,14 +46,10 @@ static GtkWidget *i2c_sw_text[16];
 static void response_event(GtkWidget *dialog,gint id,gpointer user_data) {
   g_print("%s: id=%d\n",__FUNCTION__,id);
   if(id==GTK_RESPONSE_ACCEPT) {
-    if (controller != PICOHPSDR_CONTROLLER) {
         gpio_save_state();
-    }
-    else {
         pico_save_state();
-    }
-    
-    g_print("%s: ACCEPT\n",__FUNCTION__);
+      
+        g_print("%s: ACCEPT\n",__FUNCTION__);
   }
   
   gtk_widget_destroy(dialog);
