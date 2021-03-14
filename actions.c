@@ -939,7 +939,7 @@ int switch_action(void *data) {
     // only switch functions that increment/decrement while pressed
     switch(a->action) {
       case MICPTT:
-        if(getMox()==0) {
+        if(getMox()==1) {
           setMox(0);
         }
         
