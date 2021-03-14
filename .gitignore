@@ -1,0 +1,9 @@
+*.o
+*.props
+.kdev4/
+.vscode
+hpsdrsim
+pihpsdr
+pihpsdr.kdev4
+wdspWisdom00
+
