@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <sched.h>
+#include <termios.h>
 
 #include "band.h"
 #include "channel.h"
@@ -56,9 +57,11 @@
 
 char *picopropertiesfile = "picocontroller.props" ;
 
+static GThread *picocontroller_thread_id;
+
 PICOCONTROLLER picocontroller ={
     "/dev/ttyS0",
-    "115200"
+    "B115200"
 };
 
 PICOENCODER picoencoders[MAX_ENCODERS] = {
@@ -77,7 +80,7 @@ PICOENCODER picoencoders[MAX_ENCODERS] = {
      TRUE, 8, ENCODER_IF_SHIFT,
      TRUE, 13, MENU_FILTER},
 
-    // Encoder 6
+    // Encoder 5
     {TRUE, 5, ENCODER_XIT,
      TRUE, 9, ENCODER_RIT,
      TRUE, 14, MENU_FREQUENCY},
@@ -111,6 +114,92 @@ PICOSWITCH picoswitches[MAX_PICOSWITCHES] = {
     {FALSE, 34, NB},
     {FALSE, 35, SNB}};
 
+int serial_port;
+gboolean stop_serial = FALSE;
+struct termios tty;
+
+static gpointer picocontroller_thread(gpointer arg) {
+
+    int address = 0;
+    int value = 0;
+    
+    char read_buf[256];
+    char str[100];
+        
+    while (!stop_serial) {
+        int n = read(serial_port, &read_buf, sizeof(read_buf));
+        
+        if (n > 0) {
+            for (int i=0; i < n; i++) {
+                address = read_buf[i] >> 1;
+                value = read_buf[i] & 1;
+                
+                sprintf(str, "PicoController: Control %d sent command %d\n", address, value);
+                printf(str);
+                if (address < 10) {
+                    ENCODER_ACTION *e = g_new(ENCODER_ACTION, 1);
+                    
+                    e->action = pico_find_encoder(address);
+                    e->mode=RELATIVE;
+                    e->val= value == 1 ? 1 : -1;
+                    
+                    g_idle_add(encoder_action, e);
+                }
+                else {
+                    SWITCH_ACTION *a=g_new(SWITCH_ACTION,1);
+                    
+                    a->action = pico_find_switch(address);
+                    a->state = value == 1 ? 0 : 1;
+                    
+                    g_idle_add(switch_action,a);
+                }
+            }
+        }
+    }
+    
+    return NULL;
+}
+
+gint  pico_find_switch(int address) {
+    
+    if (address >= 15) {
+        for (int x = 0; x < sizeof(picoswitches); x++) {
+            if ( picoswitches[x].switch_address == address) {
+                return picoswitches[x].switch_function;
+            }
+        }
+    } 
+    else if (address < 15) {
+        for (int x = 0; x < sizeof(picoencoders); x++) {
+            if ( picoencoders[x].switch_address == address) {
+                return picoencoders[x].switch_function;
+            }
+        } 
+    }
+    
+    return NO_ACTION;
+}
+
+gint  pico_find_encoder(int address) {
+    
+    if (address < 6) {
+        for (int x = 0; x < sizeof(picoencoders); x++) {
+            if ( picoencoders[x].bottom_encoder_address == address) {
+                return picoencoders[x].bottom_encoder_function;
+            }
+        }
+    }
+    else if (address < 10) {
+        for (int x = 0; x < sizeof(picoencoders); x++) {
+            if ( picoencoders[x].top_encoder_address == address) {
+                return picoencoders[x].top_encoder_function;
+            }
+        }
+    }
+        
+    return ENCODER_NO_ACTION;
+}
+
 void pico_configure(GtkWidget *notebook, GtkWidget *grid) {
     
         int col = 0;
@@ -127,7 +216,8 @@ void pico_configure(GtkWidget *notebook, GtkWidget *grid) {
     col+=2;
 
     widget=gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(widget),picocontroller.controller_device);
+    gtk_entry_set_text(GTK_ENTRY(widget), picocontroller.controller_device);
+    //widget.activate.connect( () => { picocontroller.controller_device = widget.get_text(); } );
     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
     col++;
 
@@ -147,7 +237,7 @@ void pico_configure(GtkWidget *notebook, GtkWidget *grid) {
     gtk_entry_set_text(GTK_ENTRY(widget), picocontroller.baudrate);
     gtk_grid_attach(GTK_GRID(grid),widget,col,row,1,1);
     col++;
-    
+   
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),grid,gtk_label_new("PIcoHPSDR Controller"));
 }
 
@@ -237,8 +327,7 @@ void pico_set_defaults(int ctrlr) {
   
 }
     
-void pico_restore_actions()
-{
+void pico_restore_actions() {
     if (controller != PICOHPSDR_CONTROLLER)
         return;
 
@@ -271,8 +360,7 @@ void pico_restore_actions()
     }
 }
 
-void pico_restore_state()
-{
+void pico_restore_state() {
     if (controller != PICOHPSDR_CONTROLLER)
         return;
 
@@ -286,6 +374,18 @@ void pico_restore_state()
     if (value)
         controller = atoi(value);
 
+    // Restore general configuration
+    sprintf(name, "picocontroller.controller_device");
+    value = getProperty(name);
+    if (value)
+        picocontroller.controller_device = value;
+    
+    sprintf(name, "picocontroller.baudrate");
+    value = getProperty(name);
+    if (value)
+        picocontroller.baudrate = value;
+    
+    
     for (int i = 0; i < MAX_PICOENCODERS; i++)
     {
         sprintf(name, "picoencoders[%d].bottom_encoder_enabled", i);
@@ -334,8 +434,7 @@ void pico_restore_state()
     }
 }
 
-void pico_save_actions()
-{
+void pico_save_actions() {
     if (controller != PICOHPSDR_CONTROLLER)
         return;
 
@@ -364,8 +463,8 @@ void pico_save_actions()
     }
 }
 
-void pico_save_state()
-{
+void pico_save_state() {
+    
     if (controller != PICOHPSDR_CONTROLLER)
         return;
 
@@ -376,6 +475,15 @@ void pico_save_state()
     sprintf(value, "%d", controller);
     setProperty("controller", value);
 
+    // Save general configuration
+    sprintf(name, "picocontroller.controller_device");
+    sprintf(value, picocontroller.controller_device);
+    setProperty(name, value);
+    
+    sprintf(name, "picocontroller.baudrate");
+    sprintf(value, picocontroller.baudrate);
+    setProperty(name, value);
+    
     for (int i = 0; i < MAX_PICOENCODERS; i++)
     {
         sprintf(name, "picoencoders[%d].bottom_encoder_enabled", i);
@@ -417,12 +525,68 @@ void pico_save_state()
     saveProperties(picopropertiesfile);
 }
 
-int pico_init()
-{
+int pico_init() {
     int ret = 0;
+    
+    if (controller != PICOHPSDR_CONTROLLER)
+        return ret;
+  
+    printf("Opening serial port for picohpsdrcontroller\n");
+    serial_port = open(picocontroller.controller_device, O_RDWR);
+        
+    if (serial_port < 0) {
+            printf("ERROR %i from open serial port: %s\n", errno, strerror(errno));
+            exit(-1);
+    }
+    
+    if ( tcgetattr(serial_port, &tty) != 0 ) {
+        printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
+        exit(-1);
+    }
+
+    tty.c_cflag &= ~PARENB;
+    tty.c_cflag &= ~CSTOPB;
+    tty.c_cflag |= CS8;
+    tty.c_cflag &= ~CRTSCTS;
+    tty.c_cflag |= CREAD | CLOCAL;
+    
+    tty.c_lflag &= ~ICANON;
+    tty.c_lflag &= ~ECHO; // Disable echo
+    tty.c_lflag &= ~ECHOE; // Disable erasure
+    tty.c_lflag &= ~ECHONL; // Disable new-line echo
+    tty.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY);
+    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);
+            
+    tty.c_oflag &= ~OPOST;
+    tty.c_oflag &= ~ONLCR;
+
+    tty.c_cc[VTIME] = 10;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
+    tty.c_cc[VMIN] = 0;
+ 
+    cfsetispeed(&tty, B115200);
+    cfsetospeed(&tty, B115200);
+
+    if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
+        printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
+        exit(-1);
+    } 
+    
+    picocontroller_thread_id = g_thread_new( "picohpsdrcontroller", picocontroller_thread, NULL);
+
+    if(!picocontroller_thread_id ) {
+        g_print("%s: g_thread_new failed on picohpsdrcontroller_thread\n",__FUNCTION__);
+        exit( -1 );
+    }
+    else {
+      g_print("%s: picohpsdrcontroller_thread: id=%p\n", __FUNCTION__, picocontroller_thread_id);
+    }
+    
     return ret;
 }
 
 void pico_close()
 {
+    stop_serial = TRUE;
+    close(serial_port);
 }
