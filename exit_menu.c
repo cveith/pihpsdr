@@ -35,6 +35,7 @@
 #include "actions.h"
 #ifdef GPIO
 #include "gpio.h"
+#include "picocontroller.h"
 #endif
 
 static GtkWidget *parent_window=NULL;
@@ -55,6 +56,7 @@ static gboolean discovery_cb (GtkWidget *widget, GdkEventButton *event, gpointer
   cleanup();
 #ifdef GPIO
   gpio_close();
+  pico_close();
 #endif
   switch(protocol) {
     case ORIGINAL_PROTOCOL:
@@ -92,6 +94,7 @@ static gboolean exit_cb (GtkWidget *widget, GdkEventButton *event, gpointer data
 g_print("exit_cb\n");
 #ifdef GPIO
   gpio_close();
+  pico_close();
 #endif
 #ifdef CLIENT_SERVER
   if(!radio_is_remote) {
@@ -120,6 +123,7 @@ g_print("exit_cb\n");
 static gboolean reboot_cb (GtkWidget *widget, GdkEventButton *event, gpointer data) {
 #ifdef GPIO
   gpio_close();
+  pico_close();
 #endif
   switch(protocol) {
     case ORIGINAL_PROTOCOL:
@@ -142,6 +146,7 @@ static gboolean reboot_cb (GtkWidget *widget, GdkEventButton *event, gpointer da
 static gboolean shutdown_cb (GtkWidget *widget, GdkEventButton *event, gpointer data) {
 #ifdef GPIO
   gpio_close();
+  pico_close();
 #endif
   switch(protocol) {
     case ORIGINAL_PROTOCOL:

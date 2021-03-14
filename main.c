@@ -45,6 +45,7 @@
 #include "actions.h"
 #ifdef GPIO
 #include "gpio.h"
+#include "picocontroller.h"
 #endif
 #include "wdsp.h"
 #include "new_menu.h"
@@ -148,6 +149,7 @@ gboolean main_delete (GtkWidget *widget) {
   if(radio!=NULL) {
 #ifdef GPIO
     gpio_close();
+    pico_close();
 #endif
 #ifdef CLIENT_SERVER
     if(!radio_is_remote) {

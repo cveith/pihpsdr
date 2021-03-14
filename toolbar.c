@@ -25,6 +25,7 @@
 #include <string.h>
 #include "actions.h"
 #include "gpio.h"
+#include "picocontroller.h"
 #include "toolbar.h"
 #include "mode.h"
 #include "filter.h"
@@ -364,9 +365,11 @@ static void stop() {
   }
 #ifdef GPIO
   gpio_close();
+  pico_close();
 #endif
 #ifdef WIRIINGPI
   gpio_close();
+  pico_close();
 #endif
 }
 
