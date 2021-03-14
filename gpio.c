@@ -970,41 +970,45 @@ int gpio_init() {
     goto err;
   }
 
-  // setup encoders
-  g_print("%s: setup encoders\n",__FUNCTION__);
-  for(int i=0;i<MAX_ENCODERS;i++) {
-    if(encoders[i].bottom_encoder_enabled) {
-      if(setup_line(chip,encoders[i].bottom_encoder_address_a,encoders[i].bottom_encoder_pullup)<0) {
-        continue;
-      }
-      if(setup_line(chip,encoders[i].bottom_encoder_address_b,encoders[i].bottom_encoder_pullup)<0) {
-        continue;
-      }
-    }
+  if (controller != PICOHPSDR_CONTROLLER) {
+    // setup encoders
+    g_print("%s: setup encoders\n",__FUNCTION__);
+    for(int i=0;i<MAX_ENCODERS;i++) {
+        if(encoders[i].bottom_encoder_enabled) {
+        if(setup_line(chip,encoders[i].bottom_encoder_address_a,encoders[i].bottom_encoder_pullup)<0) {
+            continue;
+        }
+        if(setup_line(chip,encoders[i].bottom_encoder_address_b,encoders[i].bottom_encoder_pullup)<0) {
+            continue;
+        }
+        }
 
-    if(encoders[i].top_encoder_enabled) {
-      if(setup_line(chip,encoders[i].top_encoder_address_a,encoders[i].top_encoder_pullup)<0) {
-        continue;
-      }
-      if(setup_line(chip,encoders[i].top_encoder_address_b,encoders[i].top_encoder_pullup)<0) {
-        continue;
-      }
-    }
+        if(encoders[i].top_encoder_enabled) {
+        if(setup_line(chip,encoders[i].top_encoder_address_a,encoders[i].top_encoder_pullup)<0) {
+            continue;
+        }
+        if(setup_line(chip,encoders[i].top_encoder_address_b,encoders[i].top_encoder_pullup)<0) {
+            continue;
+        }
+        }
 
-    if(encoders[i].switch_enabled) {
-      if(setup_line(chip,encoders[i].switch_address,encoders[i].switch_pullup)<0) {
-        continue;
-      }
+        if(encoders[i].switch_enabled) {
+        if(setup_line(chip,encoders[i].switch_address,encoders[i].switch_pullup)<0) {
+            continue;
+        }
+        }
     }
   }
 
-  // setup switches
-  g_print("%s: setup switches\n",__FUNCTION__);
-  for(int i=0;i<MAX_SWITCHES;i++) {
-    if(switches[i].switch_enabled) {
-      if(setup_line(chip,switches[i].switch_address,switches[i].switch_pullup)<0) {
-        continue;
-      }
+  if (controller != PICOHPSDR_CONTROLLER) {
+    // setup switches
+    g_print("%s: setup switches\n",__FUNCTION__);
+    for(int i=0;i<MAX_SWITCHES;i++) {
+        if(switches[i].switch_enabled) {
+        if(setup_line(chip,switches[i].switch_address,switches[i].switch_pullup)<0) {
+            continue;
+        }
+        }
     }
   }
 
@@ -1042,7 +1046,7 @@ int gpio_init() {
   }
 #endif
 
-  if(controller!=NO_CONTROLLER
+  if(controller!=NO_CONTROLLER && controller != PICOHPSDR_CONTROLLER
 #ifdef LOCALCW
     || ENABLE_CW_BUTTONS
 #endif
@@ -1052,7 +1056,7 @@ int gpio_init() {
       g_print("%s: g_thread_new failed for monitor_thread\n",__FUNCTION__);
     }
 
-    if(controller!=NO_CONTROLLER) {
+    if(controller!=NO_CONTROLLER && controller != PICOHPSDR_CONTROLLER) {
       rotary_encoder_thread_id = g_thread_new( "encoders", rotary_encoder_thread, NULL);
       if(!rotary_encoder_thread_id ) {
         g_print("%s: g_thread_new failed on rotary_encoder_thread\n",__FUNCTION__);
