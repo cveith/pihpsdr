@@ -530,6 +530,8 @@ int switch_action(void *data) {
             toolbar_switches=switches_controller1[function];
             update_toolbar_labels();
 	    break;
+      case PICOHPSDR_CONTROLLER:
+          break;
         }
         break;
       case TUNE:
@@ -559,6 +561,19 @@ int switch_action(void *data) {
           }
         } else {
           setMox(0);
+        }
+        g_idle_add(ext_vfo_update,NULL);
+        break;
+      case MICPTT:
+        if(getTune()==1) {
+          setTune(0);
+        }
+        if(getMox()==0) {
+          if(canTransmit() || tx_out_of_band) {
+            setMox(1);
+          } else {
+            transmitter_set_out_of_band(transmitter);
+          }
         }
         g_idle_add(ext_vfo_update,NULL);
         break;
@@ -923,6 +938,14 @@ int switch_action(void *data) {
   } else if(a->state==RELEASED) {
     // only switch functions that increment/decrement while pressed
     switch(a->action) {
+      case MICPTT:
+        if(getMox()==0) {
+          setMox(0);
+        }
+        
+        g_idle_add(ext_vfo_update,NULL);
+        break;
+        
       default:
         break;
     }
