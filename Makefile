@@ -139,18 +139,21 @@ GPIO_SOURCES= \
   configure.c \
   i2c.c \
   gpio.c \
+  picocontroller.c \
   encoder_menu.c \
   switch_menu.c
 GPIO_HEADERS= \
   configure.h \
   i2c.h \
   gpio.h \
+  picocontroller.h \
   encoder_menu.h \
   switch_menu.h
 GPIO_OBJS= \
   configure.o \
   i2c.o \
   gpio.o \
+  picocontroller.o \
   encoder_menu.o \
   switch_menu.o
 endif
