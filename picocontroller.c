@@ -66,34 +66,34 @@ PICOCONTROLLER picocontroller ={
 
 PICOENCODER picoencoders[MAX_ENCODERS] = {
     // Encoder 2
-    {TRUE, 2, ENCODER_RF_GAIN,
-     TRUE, 6, ENCODER_AF_GAIN,
+    {TRUE, 2, RF_GAIN,
+     TRUE, 6, AF_GAIN,
      TRUE, 11, MENU_BAND},
 
     // Encoder 3
-    {TRUE, 3, ENCODER_ATTENUATION,
-     TRUE, 7, ENCODER_AGC_GAIN,
+    {TRUE, 3, ATTENUATION,
+     TRUE, 7, AGC_GAIN,
      TRUE, 12, MENU_MODE},
 
     // Encoder 4
-    {TRUE, 4, ENCODER_IF_WIDTH,
-     TRUE, 8, ENCODER_IF_SHIFT,
+    {TRUE, 4, IF_WIDTH,
+     TRUE, 8, IF_SHIFT,
      TRUE, 13, MENU_FILTER},
 
     // Encoder 5
-    {TRUE, 5, ENCODER_XIT,
-     TRUE, 9, ENCODER_RIT,
+    {TRUE, 5, XIT,
+     TRUE, 9, RIT,
      TRUE, 14, MENU_FREQUENCY},
 
     // VFO Encoder
-    {TRUE, 1, ENCODER_VFO,
-     FALSE, 0, ENCODER_NO_ACTION,
+    {TRUE, 1, VFO,
+     FALSE, 0, NO_ACTION,
      FALSE, 0, NO_ACTION},
 };
 
 PICOSWITCH picoswitches[MAX_PICOSWITCHES] = {
-    {FALSE, 15, MICPTT},     // External PTT
-    {FALSE, 16, MICPTT},     // Microphone PTT
+    {FALSE, 15, PTT},        // External PTT
+    {FALSE, 16, PTT},        // Microphone PTT
     {FALSE, 17, BAND_MINUS}, // Microphone Down Button
     {FALSE, 18, BAND_PLUS},  // Microphone Up Button
     {FALSE, 19, MUTE},       // Microphone FST Button
@@ -127,6 +127,8 @@ static gpointer picocontroller_thread(gpointer arg) {
     char str[100];
         
     while (!stop_serial) {
+        PROCESS_ACTION *a;
+
         int n = read(serial_port, &read_buf, sizeof(read_buf));
         
         if (n > 0) {
@@ -137,21 +139,22 @@ static gpointer picocontroller_thread(gpointer arg) {
                 sprintf(str, "PicoController: Control %d sent command %d\n", address, value);
                 printf(str);
                 if (address < 10) {
-                    ENCODER_ACTION *e = g_new(ENCODER_ACTION, 1);
+                    a=g_new(PROCESS_ACTION,1);
+
+                    a->action = pico_find_encoder(address);
+                    a->mode=RELATIVE;
+                    a->val= value == 1 ? 1 : -1;
                     
-                    e->action = pico_find_encoder(address);
-                    e->mode=RELATIVE;
-                    e->val= value == 1 ? 1 : -1;
-                    
-                    g_idle_add(encoder_action, e);
+                    g_idle_add(process_action,a);
                 }
                 else {
-                    SWITCH_ACTION *a=g_new(SWITCH_ACTION,1);
+                    a=g_new(PROCESS_ACTION,1);
                     
                     a->action = pico_find_switch(address);
-                    a->state = value == 1 ? 0 : 1;
+                    a->mode = value == 1 ? PRESSED : RELEASED;
                     
-                    g_idle_add(switch_action,a);
+                    g_idle_add(process_action,a);
+
                 }
             }
         }
@@ -197,7 +200,7 @@ gint  pico_find_encoder(int address) {
         }
     }
         
-    return ENCODER_NO_ACTION;
+    return NO_ACTION;
 }
 
 void pico_configure(GtkWidget *notebook, GtkWidget *grid) {
