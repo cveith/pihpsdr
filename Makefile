@@ -299,12 +299,14 @@ cwramp.c \
 protocols.c \
 css.c \
 actions.c \
+action_dialog.c \
 configure.c \
 i2c.c \
 gpio.c \
 picocontroller.c \
 encoder_menu.c \
-switch_menu.c
+switch_menu.c \
+toolbar_menu.c
 
 
 
@@ -376,12 +378,14 @@ error_handler.h \
 protocols.h \
 css.h \
 actions.h \
+action_dialog.h \
 configure.h \
 i2c.h \
 gpio.h \
 picocontroller.h \
 encoder_menu.h \
-switch_menu.h
+switch_menu.h \
+toolbar_menu.h
 
 
 
@@ -452,12 +456,14 @@ cwramp.o \
 protocols.o \
 css.o \
 actions.o \
+action_dialog.o \
 configure.o \
 i2c.o \
 gpio.o \
 picocontroller.o \
 encoder_menu.o \
-switch_menu.o
+switch_menu.o \
+toolbar_menu.o
 
 $(PROGRAM):  $(OBJS) $(AUDIO_OBJS) $(REMOTE_OBJS) $(USBOZY_OBJS) $(SOAPYSDR_OBJS) \
 		$(LOCALCW_OBJS) $(PURESIGNAL_OBJS) \
